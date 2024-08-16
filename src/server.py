@@ -67,38 +67,38 @@ class MerossMetrics:
                 else:
                     tagline = "none"
                 
-            self.module_device_info.labels(
-                device=module.uuid,
-                name=module.name,
-                tag=tagline,
-                network_status=str(network),
-                type=device_type,
-                source="Meross").set("1")
-            if power_on :
-                self.module_power_status.labels(
+                self.module_device_info.labels(
                     device=module.uuid,
                     name=module.name,
                     tag=tagline,
-                    type=device_type).set("1")
+                    network_status=str(network),
+                    type=device_type,
+                    source="Meross").set("1")
+                if power_on :
+                    self.module_power_status.labels(
+                        device=module.uuid,
+                        name=module.name,
+                        tag=tagline,
+                        type=device_type).set("1")
 
-                self.module_power_consumption.labels(
-                    device=module.uuid,
-                    name=module.name,
-                    tag=tagline,
-                    type=device_type).set(str(wattage))
+                    self.module_power_consumption.labels(
+                        device=module.uuid,
+                        name=module.name,
+                        tag=tagline,
+                        type=device_type).set(str(wattage))
 
-            else:
-                self.module_power_status.labels(
-                    device=module.uuid,
-                    name=module.name,
-                    tag=tagline,
-                    type=device_type).set("0")
-                
-                self.module_power_consumption.labels(
-                    device=module.uuid,
-                    name=module.name,
-                    tag=tagline,
-                    type=device_type).set("0")
+                else:
+                    self.module_power_status.labels(
+                        device=module.uuid,
+                        name=module.name,
+                        tag=tagline,
+                        type=device_type).set("0")
+                    
+                    self.module_power_consumption.labels(
+                        device=module.uuid,
+                        name=module.name,
+                        tag=tagline,
+                        type=device_type).set("0")
 
 def main():
     """Main entry point"""
