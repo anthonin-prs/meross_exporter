@@ -1,0 +1,26 @@
+{
+    "Chambre": {
+        "tag": "Chambre",
+        "type": "Prise"
+    },
+    "Meuble TV": {
+        "tag": "Salle",
+        "type": "Prise"
+    },
+    "Clim": {
+        "tag": "Chambre",
+        "type": "Prise"
+    },
+    "Serveurs": {
+        "tag": "Infra",
+        "type": "Prise"
+    },
+    "Bureau Anthonin": {
+        "tag": "Bureau",
+        "type": "Prise"
+    },
+    "Ventilateur": {
+        "tag": "Chambre",
+        "type": "Prise"
+    }
+}
