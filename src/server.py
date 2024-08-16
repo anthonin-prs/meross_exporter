@@ -1,10 +1,9 @@
-"""Application exporter"""
-
 import os
 import json
 from prometheus_client import start_http_server, Gauge, Enum, Counter
 import time
 import asyncio, os
+
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 
@@ -102,7 +101,7 @@ def main():
     """Main entry point"""
 
     polling_interval_seconds = int(
-        os.getenv("POLLING_INTERVAL_SECONDS", "600"))
+        os.getenv("POLLING_INTERVAL_SECONDS", "60"))
     exporter_port = int(os.getenv("EXPORTER_PORT", "8000"))
 
     app_metrics = MerossMetrics(
