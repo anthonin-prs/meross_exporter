@@ -1,4 +1,4 @@
-d ."""Application exporter"""
+"""Application exporter"""
 
 import os
 import json
