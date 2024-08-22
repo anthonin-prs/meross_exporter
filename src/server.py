@@ -2,12 +2,14 @@ import os
 import json
 from prometheus_client import start_http_server, Gauge, Enum, Counter
 import time
-import asyncio, os
+import asyncio
+import os
 
 from meross_iot.http_api import MerossHttpClient
 from meross_iot.manager import MerossManager
 
 plugs_refs = ["mss310"]
+
 
 class MerossMetrics:
     email = os.environ["EMAIL"]
@@ -31,12 +33,13 @@ class MerossMetrics:
         self.module_power_consumption = Gauge(
             "module_power_consumption", "Power consuption of module", ['device', 'name', 'tag', 'type'])
 
-    def run_metrics_loop(self, loop):
+    def run_metrics_loop(self):
         """Metrics fetching loop"""
 
         while True:
-            final_data = loop.run_until_complete(self.fetch())
-            # self.fetch()
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.fetch())
+            loop.close()
             print(str(time.strftime("%Y-%m-%d %H:%M:%S")) +
                   " -- GATHERING DATA")
             time.sleep(self.polling_interval_seconds)
@@ -53,7 +56,7 @@ class MerossMetrics:
         await manager.async_device_discovery()
         meross_devices = manager.find_devices()
         for module in meross_devices:
-            if(module.type in plugs_refs):
+            if (module.type in plugs_refs):
                 instant_consumption = await module.async_get_instant_metrics()
                 wattage = str(instant_consumption).split(" ")[2]
                 power_on = True if float(wattage) > 0.0 else False
@@ -63,7 +66,7 @@ class MerossMetrics:
                     tagline = self.metadata[module.name]['tag']
                 else:
                     tagline = "none"
-                
+
                 self.module_device_info.labels(
                     device=module.uuid,
                     name=module.name,
@@ -71,7 +74,7 @@ class MerossMetrics:
                     network_status=str(network),
                     type=device_type,
                     source="Meross").set("1")
-                if power_on :
+                if power_on:
                     self.module_power_status.labels(
                         device=module.uuid,
                         name=module.name,
@@ -90,12 +93,13 @@ class MerossMetrics:
                         name=module.name,
                         tag=tagline,
                         type=device_type).set("0")
-                    
+
                     self.module_power_consumption.labels(
                         device=module.uuid,
                         name=module.name,
                         tag=tagline,
                         type=device_type).set("0")
+
 
 def main():
     """Main entry point"""
@@ -108,10 +112,7 @@ def main():
         polling_interval_seconds=polling_interval_seconds
     )
     start_http_server(exporter_port)
-    loop = asyncio.get_event_loop()
-    app_metrics.run_metrics_loop(loop)
-    loop.close()
-
+    app_metrics.run_metrics_loop()
 
 
 if __name__ == "__main__":
