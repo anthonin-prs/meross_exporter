@@ -33,13 +33,12 @@ class MerossMetrics:
         self.module_power_consumption = Gauge(
             "module_power_consumption", "Power consuption of module", ['device', 'name', 'tag', 'type'])
 
-    def run_metrics_loop(self):
+    def run_metrics_loop(self, loop):
         """Metrics fetching loop"""
 
         while True:
-            loop = asyncio.get_event_loop()
+            
             loop.run_until_complete(self.fetch())
-            loop.close()
             print(str(time.strftime("%Y-%m-%d %H:%M:%S")) +
                   " -- GATHERING DATA")
             time.sleep(self.polling_interval_seconds)
@@ -99,6 +98,8 @@ class MerossMetrics:
                         name=module.name,
                         tag=tagline,
                         type=device_type).set("0")
+        manager.close()
+        await http_api_client.async_logout()
 
 
 def main():
@@ -111,8 +112,11 @@ def main():
     app_metrics = MerossMetrics(
         polling_interval_seconds=polling_interval_seconds
     )
+    loop = asyncio.get_event_loop()
     start_http_server(exporter_port)
-    app_metrics.run_metrics_loop()
+    app_metrics.run_metrics_loop(loop)
+    print("Closing loop")
+    loop.close()
 
 
 if __name__ == "__main__":
